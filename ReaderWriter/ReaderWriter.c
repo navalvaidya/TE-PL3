@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <omp.h>
+
+omp_lock_t w,r;
+char buff[10];
+int nr=0,wr=0,readCount=0;
+void startRead(){
+	readCount;
+	omp_set_lock(&r);
+	readCount++;
+	if(readCount==1){
+		omp_set_lock(&w);
+	}
+	omp_unset_lock(&r);
+}
+
+void endRead(){
+	omp_set_lock(&r);
+	readCount--;
+	if(readCount==0){
+		omp_unset_lock(&w);
+	}
+	omp_unset_lock(&r);
+}
+
+void reader(){
+	int tid;
+	startRead();
+	tid=omp_get_thread_num();
+	printf("Thread %d reading the buffer content : %s\n",tid,buff);
+	endRead();
+}
+
+void writer(){
+	
+	omp_set_lock(&w);
+	printf("\nWriter %d aquired the lock\n",omp_get_thread_num());
+	printf("Enter text to overwrite buffer : ");
+	scanf("%s",buff);
+	omp_unset_lock(&w);
+	printf("Writer %d releasing the lock\n",omp_get_thread_num());
+}
+int main(){
+	int i;
+	omp_set_num_threads(8);
+	printf("Enter No. of Reader Threads : ");
+	scanf("%d",&nr);
+
+	printf("Enter No. of Writer Threads : ");
+	scanf("%d",&wr);
+
+	printf("Enter Some Text : ");
+	scanf("%s",&buff);
+
+	omp_init_lock(&w);
+	omp_init_lock(&r);
+
+	#pragma omp parallel
+	{
+		#pragma omp for
+		for(i=0;i<(nr+wr);i++){
+			if(i<wr){
+				writer();
+			}
+			else{
+				reader();
+			}
+	
+		}
+	}
+
+	
+return 0;
+}

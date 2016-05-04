@@ -1,0 +1,29 @@
+/*
+[student@student ~]$ g++ -g -fopenmp orgprim.cpp
+[student@student ~]$ ./a.out
+Enter the number of node:4
+Enter the edges:for node:0
+999
+50
+999
+40
+for node:1
+50
+999
+20
+999
+for node:2
+999
+20
+999
+30
+for node:3
+40
+999
+30
+999
+0	3
+3	2
+2	1
+0	0
+64.2492[student@student ~]$*/	

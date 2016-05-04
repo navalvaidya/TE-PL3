@@ -1,0 +1,7 @@
+for(i=i<10;i++)
+{
+	printf("done");
+	i=i+10;
+	printf("done");
+	i=i-2;
+}

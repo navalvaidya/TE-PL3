@@ -1,0 +1,10 @@
+/*
+output:
+[student@student ~]$ gedit orgprim.cpp
+[student@student ~]$ g++ -g -fopenmp orgprim.cpp
+[student@student ~]$ ./a.out
+0	3
+3	2
+2	1
+0	0
+0.000130275[student@student ~]$ */

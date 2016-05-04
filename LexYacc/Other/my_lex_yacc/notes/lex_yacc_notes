@@ -1,0 +1,61 @@
+yywrap():
+	Another Lex library routine that the user will sometimes want to redefine is yywrap() which is called whenever Lex reaches an end-of-file. If yywrap returns a 1, Lex continues with the normal wrapup on end of input. Sometimes, however, it is convenient to arrange for more input to arrive from a new source. In this case, the user should provide a yywrap which arranges for new input and returns 0. This instructs Lex to continue processing. The default yywrap always returns 1.
+
+This routine is also a convenient place to print tables, summaries, etc. at the end of a program. Note that it is not possible to write a normal rule which recognizes end-of-file; the only access to this condition is through yywrap. In fact, unless a private version of input() is supplied a file containing nulls cannot be handled, since a value of 0 returned by input is taken to be end-of-file.
+
+
+*******************************************************************************************************************
+
+
+yylex():
+
+Whenever `yylex()' is called, it scans tokens from the global input file yyin (which defaults to stdin). It continues until it either reaches an end-of-file (at which point it returns the value 0) or one of its actions executes a return statement.
+
+If `yylex()' stops scanning due to executing a return statement in one of the actions, the scanner may then be called again and it will resume scanning where it left off.
+
+
+Lex generates yylex():
+
+
+In fact, lex does not generate a complete program. Lex generates a single function, 
+(int) yylex() 
+and some associated global variables.
+
+yylex() reads the input indicated by the global variable (FILE*) yyin. 
+yyin defaults to the standard input.
+
+When lex reaches the end of the file it is reading, it calls a function (int) yywrap() If yywrap() returns non-zero, yylex() returns a zero value. If yywrap() returns zero, yylex() keeps scanning, from where it left off, with whatever input is available on yyin. This is only useful if yywrap() has changed yyin to provide for additional input.
+
+The library libl (or libfl for flex) provides two functions which are needed to complete our stand-alone lex program:
+
+main() 
+...which simply calls yylex()
+yywrap() 
+...which always returns non-zero.
+
+*********************************************************************************************************************
+
+yyparse() calls yylex() to get successive tokens
+
+*********************************************************************************************************************
+
+How do Lex and YACC work internally
+
+In the YACC file, you write your own main() function, which calls yyparse() at one point. The function yyparse() is created for you by YACC, and ends up in y.tab.c.
+
+yyparse() reads a stream of token/value pairs from yylex(), which needs to be supplied. You can code this function yourself, or have Lex do it for you. In our examples, we've chosen to leave this task to Lex.
+
+The yylex() as written by Lex reads characters from a FILE * file pointer called yyin. If you do not set yyin, it defaults to standard input. It outputs to yyout, which if unset defaults to stdout. You can also modify yyin in the yywrap() function which is called at the end of a file. It allows you to open another file, and continue parsing.
+
+If this is the case, have it return 0. If you want to end parsing at this file, let it return 1.
+
+Each call to yylex() returns an integer value which represents a token type. This tells YACC what kind of token it has read. The token may optionally have a value, which should be placed in the variable yylval.
+
+By default yylval is of type int, but you can override that from the YACC file by re#defining YYSTYPE.
+
+The Lexer needs to be able to access yylval. In order to do so, it must be declared in the scope of the lexer as an extern variable. The original YACC neglects to do this for you, so you should add the following to your lexter, just beneath #include <y.tab.h>:
+
+extern YYSTYPE yylval;
+Bison, which most people are using these days, does this for you automatically.
+
+**********************************************************************************************************************

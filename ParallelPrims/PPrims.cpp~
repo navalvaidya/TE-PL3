@@ -1,0 +1,62 @@
+#include <iostream>
+#include <stdlib.h>
+#include <omp.h>
+using namespace std;
+
+int main(){
+	
+	int nodes,u=0,v=0,total=0;
+	int min;	
+	cout<<"Enter no. of nodes : ";
+	cin>>nodes;
+
+	int Matrix[4][4] = {{999, 50, 999, 40}, {50, 999, 20, 999}, {999, 20, 999, 30}, {40, 999, 30, 999}};
+	int visited[10];
+
+	for(int i=0;i<nodes;i++){
+		visited[i]=0;
+		for(int j=0;j<nodes;j++){
+			if(Matrix[i][j]==0){
+				Matrix[i][j]=999;			
+			}
+		}
+	}
+
+	for(int i=0;i<nodes;i++){
+		for(int j=0;j<nodes;j++){
+				cout<<Matrix[i][j]<<"\t";
+		}
+		cout<<"\n";
+	}
+
+	visited[0] = 1;
+	//start algorithm
+	
+	for(int counter=0;counter<nodes-1;counter++){
+		min=999;
+		for(int i=0;i<nodes;i++){
+			if(visited[i]==1){
+				#pragma omp parallel for
+				for(int j=0;j<nodes;j++){
+					if(visited[j]!=1){
+						#pragma omp critical
+						if(min>Matrix[i][j]){
+							min=Matrix[i][j];
+							u=i;
+							v=j;
+						}
+					}
+				}			
+			}
+		}
+		visited[v]=1;
+		total += min;
+		cout<<"Edge connected : "<<u<<" -> "<<v<<" : "<<min<<"\n"; 
+	
+	}
+	
+	cout<<"Total Weight of spanning tree is :"<<total<<"\n";
+	
+
+return 0;
+}
